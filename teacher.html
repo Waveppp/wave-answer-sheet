@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fa6b18">
+  <title>หน้าครู | ครูเวฟ - Wave Sci Labs</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23fa6b18'/%3E%3Cpath d='m5 10 5 13 6-12 6 12 5-13' fill='none' stroke='white' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exam.css">
+  <script src="config.js"></script>
+  <script type="module" src="teacher.js"></script>
+</head>
+<body class="teacher-page">
+  <header class="masthead"><div class="masthead-inner">
+    <a class="brand" href="./" aria-label="ครูเวฟ - Wave Sci Labs หน้ากระดาษคำตอบ"><img src="brand-logo.png" alt="โลโก้ครูเวฟ" width="42" height="42"><span><strong>ครูเวฟ <span class="brand-separator">/</span> Wave Sci Labs</strong><small>หน้าครู · ผลสอบจำลอง</small></span></a>
+    <div class="account" id="account" hidden>
+      <a class="pill-link" href="./">กระดาษคำตอบ →</a>
+      <span class="account-name"><strong id="account-name"></strong><small id="account-email"></small></span>
+      <button id="logout" class="ghost-button">ออกจากระบบ</button>
+    </div>
+  </div></header>
+
+  <div id="loading-view" class="center-view"><div class="spinner" aria-hidden="true"></div><p>กำลังโหลด…</p></div>
+
+  <main id="login-view" class="center-view" hidden>
+    <section class="auth-card">
+      <img src="brand-logo.png" alt="" width="64" height="64">
+      <p class="eyebrow">TEACHER DASHBOARD</p>
+      <h1>เข้าสู่ระบบหน้าครู<span class="orange">.</span></h1>
+      <p class="auth-text">เฉพาะอีเมลที่อยู่ในแท็บ Teachers ของ Google Sheet</p>
+      <div id="login-slot" class="login-slot"></div>
+      <p id="login-error" class="form-error" role="alert"></p>
+    </section>
+  </main>
+
+  <main class="workspace teacher" id="dash-view" hidden>
+    <div class="page-heading"><div><p class="eyebrow">TEACHER DASHBOARD</p><h1>ผลสอบของนักเรียน<span class="orange">.</span></h1><p class="intro" id="dash-sub">เลือกชุดข้อสอบและห้องเพื่อดูสถิติ</p></div></div>
+
+    <div class="toolbar">
+      <div class="seg" role="group" aria-label="ชุดข้อสอบ">
+        <button class="seg-btn active" data-exam="mahidol" aria-pressed="true">แนวมหิดลวิทย์</button>
+        <button class="seg-btn" data-exam="triam" aria-pressed="false">แนวเตรียมอุดม</button>
+      </div>
+      <label class="select-wrap">ห้อง <select id="class-filter"><option value="">ทุกห้อง</option></select></label>
+      <span class="toolbar-spacer"></span>
+      <button id="refresh" class="secondary-button small">↻ รีเฟรช</button>
+      <button id="export-scores" class="secondary-button small">⬇ คะแนน (CSV)</button>
+      <button id="export-items" class="secondary-button small">⬇ สถิติรายข้อ (CSV)</button>
+    </div>
+
+    <div id="dash-body"></div>
+  </main>
+
+  <dialog id="student-dialog" class="wide" aria-labelledby="student-dialog-title">
+    <form method="dialog"><button class="close-dialog" aria-label="ปิดหน้าต่าง" value="close">×</button></form>
+    <span class="dialog-kicker" id="student-dialog-title">ผลสอบรายบุคคล</span>
+    <div id="student-detail"></div>
+  </dialog>
+</body></html>

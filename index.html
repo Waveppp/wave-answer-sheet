@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#fa6b18">
+  <title>กระดาษคำตอบ | ครูเวฟ - Wave Sci Labs</title>
+  <meta name="description" content="กระดาษคำตอบ ครูเวฟ - Wave Sci Labs สำหรับแนวข้อสอบมหิดลวิทย์และเตรียมอุดม">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23fa6b18'/%3E%3Cpath d='m5 10 5 13 6-12 6 12 5-13' fill='none' stroke='white' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="exam.css">
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</head>
+<body class="is-loading">
+  <header class="masthead"><div class="masthead-inner">
+    <a class="brand" href="./" aria-label="ครูเวฟ - Wave Sci Labs หน้าหลัก"><img src="brand-logo.png" alt="โลโก้ครูเวฟ" width="42" height="42"><span><strong>ครูเวฟ <span class="brand-separator">/</span> Wave Sci Labs</strong><small>สนามสอบจำลอง</small></span></a>
+    <div class="account" id="account" hidden>
+      <a id="teacher-link" class="pill-link" href="teacher.html" hidden>หน้าครู →</a>
+      <span class="account-name"><strong id="account-name"></strong><small id="account-email"></small></span>
+      <button id="logout" class="ghost-button">ออกจากระบบ</button>
+    </div>
+  </div></header>
+
+  <div id="loading-view" class="center-view"><div class="spinner" aria-hidden="true"></div><p>กำลังโหลด…</p></div>
+
+  <main id="login-view" class="center-view" hidden>
+    <section class="auth-card">
+      <img src="brand-logo.png" alt="" width="64" height="64">
+      <p class="eyebrow">WAVE SCI LABS EXAMINATION</p>
+      <h1>เข้าสู่ระบบเพื่อเข้าสอบ<span class="orange">.</span></h1>
+      <p class="auth-text">ใช้บัญชี Google ที่ครูเวฟลงทะเบียนให้ไว้เท่านั้น</p>
+      <div id="login-slot" class="login-slot"></div>
+      <p id="login-error" class="form-error" role="alert"></p>
+    </section>
+  </main>
+
+  <main id="denied-view" class="center-view" hidden>
+    <section class="auth-card">
+      <div class="denied-mark" aria-hidden="true">!</div>
+      <h1>อีเมลนี้ไม่มีสิทธิ์เข้าสอบ</h1>
+      <p class="auth-text"><strong id="denied-email"></strong><br>ไม่อยู่ในรายชื่อผู้มีสิทธิ์สอบของครูเวฟ หากคิดว่าเป็นความผิดพลาด ให้แจ้งครูพร้อมอีเมลนี้ หรือเข้าสู่ระบบด้วยบัญชีอื่น</p>
+      <button id="try-other" class="primary-button">ใช้บัญชีอื่น</button>
+    </section>
+  </main>
+
+  <main class="workspace" id="exam-view" hidden>
+    <div class="page-heading"><div><p class="eyebrow">WAVE SCI LABS EXAMINATION</p><h1 id="greeting">พร้อมแล้ว ก็เริ่มฝนได้เลย<span class="orange">.</span></h1><p class="intro">เปิดโจทย์จากไฟล์ PDF แล้วเลือกคำตอบบนกระดาษแผ่นนี้</p></div><span class="edition">ม.3<br><small>สอบเข้า ม.4</small></span></div>
+    <div class="exam-tabs" role="tablist" aria-label="เลือกชุดข้อสอบ">
+      <button id="tab-mahidol" class="exam-tab active" role="tab" aria-selected="true" aria-controls="exam-panel" data-exam="mahidol"><span class="tab-number">01</span><span><strong>แนวข้อสอบมหิดลวิทย์</strong><small class="tab-status" data-status-for="mahidol">40 ข้อ · 5 ตัวเลือก</small></span><span class="tab-check" aria-hidden="true">✓</span></button>
+      <button id="tab-triam" class="exam-tab" role="tab" aria-selected="false" aria-controls="exam-panel" tabindex="-1" data-exam="triam"><span class="tab-number">02</span><span><strong>แนวข้อสอบเตรียมอุดม</strong><small class="tab-status" data-status-for="triam">40 ข้อ · 5 ตัวเลือก</small></span><span class="tab-check" aria-hidden="true">✓</span></button>
+    </div>
+    <div id="exam-panel" role="tabpanel" aria-labelledby="tab-mahidol">
+
+      <section id="start-view" class="start-card" hidden>
+        <p class="dialog-kicker" id="start-kicker">ชุดนี้ยังไม่เริ่ม</p>
+        <h2 id="start-title">แนวข้อสอบมหิดลวิทย์</h2>
+        <ul class="rules">
+          <li><b>40 ข้อ</b> ทุกข้อมีวงให้ฝน 5 ตัวเลือก และ<b>เลือกได้มากกว่า 1 คำตอบ</b></li>
+          <li>ข้อที่มีหลายคำตอบ ต้องฝน<b>ให้ตรงกับเฉลยครบทุกตัว</b>จึงได้คะแนน</li>
+          <li>เวลาแนะนำ <b>90 นาที</b> นับตั้งแต่กดเริ่ม (รีเฟรชหน้าแล้วเวลาไม่เริ่มใหม่)</li>
+          <li>ระบบบันทึกคำตอบให้อัตโนมัติ ปิดเครื่องแล้วกลับมาทำต่อได้</li>
+          <li><b>ส่งได้ครั้งเดียว</b> ส่งแล้วจะเห็นคะแนน เฉลย และคำแนะนำทันที</li>
+        </ul>
+        <button id="start-button" class="primary-button">เริ่มทำข้อสอบชุดนี้ <span aria-hidden="true">→</span></button>
+      </section>
+
+      <div class="desk" id="sheet-view" hidden>
+        <section class="paper" id="answer-panel">
+          <div class="paper-top"><div class="paper-brand"><span class="tiny-square"></span> ครูเวฟ - Wave Sci Labs</div><span id="sheet-code">ANSWER SHEET / 01</span></div>
+          <div class="paper-title"><div><h2>กระดาษคำตอบ</h2><p id="exam-title">แนวข้อสอบมหิดลวิทย์</p></div><div class="sheet-count"><strong>40</strong><span>ข้อ / 5 ตัวเลือก</span></div></div>
+          <div class="student-row"><span>ผู้เข้าสอบ <strong id="paper-name">–</strong></span><span>ห้อง <strong id="paper-class">–</strong></span></div>
+          <div class="instructions"><span class="example-bubble" aria-hidden="true"></span><p>ทุกข้อเลือกได้มากกว่า 1 คำตอบ <span>แตะวงกลมเพื่อฝนเพิ่ม แตะวงเดิมซ้ำเพื่อลบเฉพาะคำตอบนั้น</span></p></div>
+          <div id="answer-grid" class="answer-grid"></div>
+          <div class="paper-footer"><span class="registration-bars" aria-hidden="true"></span><span>ตรวจคำตอบให้ครบก่อนส่งกระดาษ</span><strong id="paper-code">WSL — 01</strong></div>
+        </section>
+        <aside class="sidebar" aria-label="สถานะการทำข้อสอบ">
+          <section class="status-card">
+            <div class="timer" id="timer-box"><span>เวลาที่เหลือ</span><strong id="timer" role="timer" aria-live="off">90:00</strong></div>
+            <div class="divider"></div>
+            <div class="status-title"><h2>การตอบของคุณ</h2><span class="pencil-icon" aria-hidden="true">✎</span></div>
+            <div class="progress-count"><strong id="answered-count">0</strong><span>/ 40 ข้อ</span></div>
+            <progress id="answer-progress" max="40" value="0" aria-label="จำนวนข้อที่ตอบแล้ว"></progress>
+            <p id="remaining-label">ยังไม่ได้ตอบ 40 ข้อ</p>
+            <div class="divider"></div>
+            <h3>ไปยังข้อ</h3>
+            <div id="question-map" class="question-map"></div>
+            <div class="legend"><span><i class="filled"></i>ตอบแล้ว</span><span><i></i>ยังไม่ตอบ</span></div>
+            <button id="first-blank" class="text-button">ไปข้อที่ยังไม่ได้ตอบ</button>
+          </section>
+          <button id="sound-toggle" class="sound-button" aria-pressed="true"><span aria-hidden="true">♫</span><span>เสียงฝนดินสอ</span><span class="switch" aria-hidden="true"></span></button>
+          <div class="note"><span class="note-label">การบันทึก</span><p id="save-detail">คำตอบบันทึกอัตโนมัติทุกครั้งที่ฝน</p></div>
+        </aside>
+      </div>
+
+      <section id="result-view" hidden></section>
+    </div>
+  </main>
+
+  <footer class="bottom-bar" id="bottom-bar" hidden><div class="bottom-inner"><div class="bottom-status"><span class="mini-sheet" aria-hidden="true">▤</span><div><strong id="bottom-count">ตอบแล้ว 0 จาก 40 ข้อ</strong><small id="bottom-subtitle"><span id="bottom-timer">90:00</span> · <span id="save-state" class="save-state">บันทึกแล้ว</span></small></div></div><button id="review-button" class="primary-button">ตรวจและส่งคำตอบ <span aria-hidden="true">✓</span></button></div></footer>
+
+  <dialog id="review-dialog" aria-labelledby="review-title"><form method="dialog"><button class="close-dialog" aria-label="ปิดหน้าต่าง" value="close">×</button></form><span class="dialog-kicker">ตรวจทานก่อนส่ง</span><h2 id="review-title">พร้อมส่งกระดาษคำตอบ?</h2><p id="review-description"></p><div id="missing-list" class="missing-list"></div><p class="dialog-note"><b>ส่งได้ครั้งเดียว</b> — ส่งแล้วจะแก้คำตอบไม่ได้ และจะเห็นคะแนนพร้อมเฉลยทันที</p><p id="submit-error" class="form-error" role="alert"></p><div class="dialog-actions"><button id="back-to-sheet" class="secondary-button">กลับไปตรวจคำตอบ</button><button id="confirm-submit" class="primary-button">ยืนยันส่งคำตอบ</button></div></dialog>
+
+  <div id="toast" class="toast" role="status" hidden></div>
+  <p id="announcement" class="sr-only" aria-live="polite"></p>
+</body></html>
