@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบจัดชมรม ม.1</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f4f6f8; --card: #ffffff; --ink: #1c2530; --muted: #5b6672; --line: #dfe4ea;
+      --primary: #0f6e63; --primary-ink: #ffffff; --primary-soft: #e3f3f0;
+      --danger: #b42318; --danger-soft: #fdecea; --warn: #9a5b00; --warn-soft: #fff4dc;
+      --ok: #157f3c; --ok-soft: #e6f6ec; --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.55 'Sarabun', system-ui, sans-serif; }
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 0 16px; }
+    h1, h2, h3 { line-height: 1.25; margin: 0; }
+    h1 { font-size: 30px; }
+    h2 { font-size: 22px; }
+    p { margin: 0; }
+
+    .dev-bar { background: #3b2a00; color: #ffe7a3; font-size: 15px; padding: 8px 16px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+    .dev-bar button { background: #ffe7a3; color: #3b2a00; border: 0; border-radius: 8px; padding: 4px 10px; font-size: 14px; }
+
+    .top { background: var(--primary); color: var(--primary-ink); }
+    .top .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 60px; }
+    .brand { font-weight: 700; font-size: 20px; background: none; border: 0; color: inherit; padding: 8px 0; }
+    .top .reload { background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.35); color: #fff; border-radius: 999px; padding: 6px 14px; font-size: 16px; white-space: nowrap; }
+
+    main { padding: 20px 0 64px; }
+    .hero { padding: 8px 0 20px; }
+    .hero p { color: var(--muted); margin-top: 6px; }
+    .section-title { font-size: 20px; margin: 4px 0 12px; }
+
+    .club-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(165px, 1fr)); gap: 12px; }
+    .club-card { --c: var(--primary); position: relative; text-align: left; background: var(--card); border: 2px solid var(--line); border-top: 8px solid var(--c); border-radius: var(--radius); padding: 14px 14px 12px; display: flex; flex-direction: column; gap: 4px; min-height: 150px; transition: transform .1s, box-shadow .1s; }
+    .club-card:hover, .club-card:focus-visible { box-shadow: 0 6px 20px rgba(0,0,0,.08); transform: translateY(-1px); }
+    .club-card.empty { border-style: dashed; border-top-style: solid; background: #fafbfc; }
+    .club-card.mine { border-color: var(--c); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c) 25%, transparent); }
+    .club-no { font-size: 14px; color: var(--muted); font-weight: 600; }
+    .club-name { font-size: 20px; line-height: 1.3; word-break: break-word; }
+    .club-card.empty .club-name { color: var(--muted); font-weight: 600; }
+    .club-teacher { font-size: 15px; color: var(--muted); }
+    .club-count { font-size: 15px; font-weight: 600; margin-top: auto; }
+    .club-count.full { color: var(--danger); }
+    .mine-tag { position: absolute; top: 10px; right: 10px; background: var(--c); color: #fff; font-size: 12px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+    .meter { display: block; height: 8px; background: #edf0f3; border-radius: 99px; overflow: hidden; margin-top: 6px; }
+    .meter > span { display: block; height: 100%; background: var(--c, var(--primary)); border-radius: 99px; }
+    .meter.lg { height: 14px; }
+
+    .summary-cta { margin-top: 24px; background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; justify-content: space-between; }
+    .summary-cta p { color: var(--muted); }
+    .foot { margin-top: 22px; text-align: center; color: var(--muted); font-size: 15px; }
+
+    .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 48px; padding: 8px 18px; border-radius: 12px; border: 2px solid var(--line); background: var(--card); font-weight: 600; }
+    .btn-primary { background: var(--primary); border-color: var(--primary); color: var(--primary-ink); }
+    .btn-lg { min-height: 56px; font-size: 20px; padding: 10px 22px; }
+    .btn-block { width: 100%; }
+    .btn:disabled { opacity: .5; cursor: not-allowed; }
+    .link { background: none; border: 0; padding: 4px 0; color: var(--primary); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .back { background: none; border: 0; color: var(--primary); font-weight: 700; font-size: 19px; padding: 6px 0; margin-bottom: 12px; }
+
+    .card { background: var(--card); border: 2px solid var(--line); border-radius: var(--radius); padding: 18px; margin-top: 16px; }
+    .card.narrow { max-width: 560px; margin-left: auto; margin-right: auto; }
+    .kicker { color: var(--muted); font-weight: 600; font-size: 15px; }
+    .muted { color: var(--muted); }
+    .small { font-size: 15px; }
+
+    label.field { display: block; font-weight: 600; margin-top: 14px; }
+    label.field .opt { font-weight: 400; color: var(--muted); font-size: 15px; }
+    input[type=text], input[type=search], input[type=password], input[type=number], input.in { display: block; width: 100%; margin-top: 6px; min-height: 52px; padding: 10px 14px; font-size: 20px; border: 2px solid #c6ced6; border-radius: 12px; background: #fff; }
+    input:focus { outline: 3px solid color-mix(in srgb, var(--primary) 35%, transparent); border-color: var(--primary); }
+    form .btn-block { margin-top: 18px; }
+
+    .club-head { --c: var(--primary); background: var(--card); border: 2px solid var(--line); border-top: 10px solid var(--c); border-radius: var(--radius); padding: 18px; display: grid; grid-template-columns: 1fr auto; gap: 8px 16px; align-items: end; }
+    .club-head h1 { word-break: break-word; }
+    .club-head .meter { grid-column: 1 / -1; }
+    .big-count { text-align: right; white-space: nowrap; }
+    .big-count strong { font-size: 44px; line-height: 1; }
+    .big-count span { font-size: 18px; color: var(--muted); margin-left: 4px; }
+
+    .step { display: flex; align-items: center; gap: 10px; font-weight: 700; margin: 18px 0 10px; }
+    .step:first-of-type { margin-top: 10px; }
+    .num { flex: none; width: 32px; height: 32px; border-radius: 50%; background: var(--primary); color: #fff; display: inline-grid; place-items: center; font-size: 17px; }
+    .room-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .room-btn { min-height: 60px; border-radius: 12px; border: 2px solid #c6ced6; background: #fff; font-size: 21px; font-weight: 700; }
+    .room-btn.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+    .pick-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; margin-top: 10px; max-height: 520px; overflow: auto; padding: 2px; }
+    .pick { display: flex; align-items: center; gap: 10px; text-align: left; min-height: 56px; padding: 8px 12px; border-radius: 12px; border: 2px solid #c6ced6; background: #fff; }
+    .pick:not(:disabled):hover { border-color: var(--primary); background: var(--primary-soft); }
+    .pick:disabled { background: #f2f4f6; cursor: default; color: var(--muted); border-color: var(--line); }
+    .pick.here:disabled { background: var(--ok-soft); color: var(--ok); border-color: #bfe5cc; }
+    .pick-no { flex: none; min-width: 36px; height: 36px; border-radius: 10px; background: #edf0f3; display: grid; place-items: center; font-weight: 700; }
+    .pick-name { flex: 1; font-weight: 600; line-height: 1.3; }
+    .pick-tag { font-size: 14px; text-align: right; line-height: 1.25; }
+    .pick-plus { font-weight: 700; color: var(--primary); white-space: nowrap; }
+
+    .add-form { display: grid; grid-template-columns: 120px 1fr; gap: 0 12px; align-items: end; }
+    .add-form label.field { margin-top: 0; }
+    .add-form .btn { grid-column: 1 / -1; margin-top: 14px; }
+    .hint { grid-column: 1 / -1; min-height: 1.5em; margin-top: 8px; font-weight: 600; font-size: 16px; }
+    .hint.warn { color: var(--danger); }
+    .hint.ok { color: var(--ok); }
+    details.manual { margin-top: 14px; }
+    details.manual summary { cursor: pointer; color: var(--primary); font-weight: 600; padding: 6px 0; }
+
+    .notice { margin-top: 16px; border-radius: 14px; padding: 14px 16px; font-weight: 600; background: var(--warn-soft); color: var(--warn); border: 2px solid #f3d999; }
+    .notice.info { background: var(--primary-soft); color: var(--primary); border-color: #b9e0d9; }
+
+    table.list { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    table.list th, table.list td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+    table.list th { font-size: 15px; color: var(--muted); font-weight: 600; }
+    table.list td.n { width: 64px; font-weight: 700; }
+    table.list td.act { width: 1%; text-align: right; }
+    table.list tr.none td { background: var(--danger-soft); }
+    table.list tr.none .club-cell { color: var(--danger); font-weight: 700; }
+    .btn-del { min-height: 44px; padding: 4px 14px; border-radius: 10px; border: 2px solid #f1b8b2; background: #fff; color: var(--danger); font-weight: 600; }
+    .btn-del:disabled { opacity: .4; cursor: default; }
+    .room-group { margin-top: 14px; font-weight: 700; color: var(--muted); font-size: 16px; }
+    .empty-text { color: var(--muted); padding: 12px 0; }
+
+    .page-head p { color: var(--muted); margin-top: 6px; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+    .tab { min-height: 52px; padding: 6px 18px; border-radius: 12px; border: 2px solid #c6ced6; background: #fff; font-weight: 700; font-size: 19px; }
+    .tab.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; }
+    .stat { flex: 1 1 140px; border-radius: 14px; padding: 12px 14px; background: var(--ok-soft); color: var(--ok); }
+    .stat strong { display: block; font-size: 32px; line-height: 1.1; }
+    .stat.warn { background: var(--danger-soft); color: var(--danger); }
+    .stat.plain { background: #eef1f4; color: var(--ink); }
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+    .chip { background: #eef1f4; border-radius: 999px; padding: 3px 12px; font-size: 15px; }
+    .chip b { margin-left: 4px; }
+    .row-actions { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; margin-top: 14px; }
+    .club-block { border-top: 6px solid var(--c, var(--primary)); }
+    .club-block h3 { font-size: 21px; }
+
+    .admin-clubs { display: grid; gap: 8px; margin-top: 10px; }
+    .admin-club { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+    .cap-row { display: flex; gap: 10px; align-items: end; flex-wrap: wrap; }
+    .cap-row input { width: 140px; }
+
+    .busy { position: fixed; inset: 0; background: rgba(244,246,248,.75); display: grid; place-content: center; justify-items: center; gap: 12px; z-index: 50; font-weight: 700; }
+    .spinner { width: 44px; height: 44px; border-radius: 50%; border: 5px solid #cfe5e1; border-top-color: var(--primary); animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%) translateY(150%); width: min(560px, calc(100% - 32px)); padding: 14px 18px; border-radius: 14px; font-weight: 700; font-size: 18px; box-shadow: 0 10px 30px rgba(0,0,0,.18); transition: transform .25s, visibility .25s; visibility: hidden; z-index: 60; background: var(--ok); color: #fff; }
+    .toast.show { transform: translateX(-50%) translateY(0); visibility: visible; }
+    .toast.err { background: var(--danger); }
+
+    #print-area { display: none; }
+
+    @media (max-width: 560px) {
+      body { font-size: 17px; }
+      h1 { font-size: 25px; }
+      .club-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+      .club-card { min-height: 140px; padding: 12px; }
+      .club-name { font-size: 18px; }
+      .room-btn { font-size: 18px; min-height: 56px; }
+      .add-form { grid-template-columns: 96px 1fr; }
+      .big-count strong { font-size: 36px; }
+      table.list th, table.list td { padding: 9px 5px; }
+      .top .reload { padding: 6px 10px; font-size: 15px; }
+    }
+
+    @media print {
+      @page { size: A4; margin: 14mm; }
+      body { background: #fff; font-size: 13pt; }
+      body > *:not(#print-area) { display: none !important; }
+      #print-area { display: block; }
+      .print-page { page-break-after: always; }
+      .print-page:last-child { page-break-after: auto; }
+      .print-page h1 { font-size: 18pt; margin-bottom: 4px; }
+      .print-page p { margin-bottom: 8px; }
+      .print-page table { width: 100%; border-collapse: collapse; }
+      .print-page th, .print-page td { border: 1px solid #555; padding: 4px 8px; text-align: left; }
+      .print-page th { background: #eee; }
+      .print-page .none { font-weight: 700; }
+    }
+  </style>
+</head>
+<body>
+  <div id="dev-bar" class="dev-bar" hidden>
+    <span>โหมดทดลอง: ข้อมูลเก็บในเบราว์เซอร์นี้เท่านั้น ยังไม่ใช่ระบบจริง</span>
+    <button onclick="CLUB_DEV.seedRoster()">ใส่รายชื่อนักเรียนตัวอย่าง</button>
+    <button onclick="CLUB_DEV.clearRoster()">ลบรายชื่อนักเรียน</button>
+    <button onclick="if(confirm('ล้างข้อมูลทดลองทั้งหมด?'))CLUB_DEV.reset()">ล้างข้อมูลทั้งหมด</button>
+  </div>
+  <header class="top"><div class="wrap">
+    <button class="brand" data-go="home">ระบบจัดชมรม ม.1</button>
+    <button class="reload" data-reload>↻ โหลดข้อมูลล่าสุด</button>
+  </div></header>
+  <main class="wrap" id="app"></main>
+  <div id="busy" class="busy" hidden><div class="spinner" aria-hidden="true"></div><p id="busy-text">กำลังโหลด…</p></div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <div id="print-area"></div>
+
+  <script>
+    // นอก Apps Script (เช่นเปิดไฟล์ในเครื่อง) ให้ใช้หลังบ้านจำลอง
+    if (!(window.google && google.script && google.script.run)) document.write('<script src="dev/fake-gas.js"><\/script>');
+  </script>
+  <script>
+  (function () {
+    'use strict';
+    const COLORS = ['#0f6e63', '#c2410c', '#1d4ed8', '#a21caf', '#15803d', '#b45309', '#0e7490', '#be123c', '#4d7c0f', '#6d28d9'];
+    const S = { data: null, view: 'home', clubId: null, room: null, sumTab: null, pin: null, focus: null };
+    const app = document.getElementById('app');
+    const $ = id => document.getElementById(id);
+    let myClub = null;
+    try { myClub = Number(localStorage.getItem('club-my')) || null; } catch (_) { /* ไม่จำก็ได้ */ }
+    if (window.CLUB_DEV) $('dev-bar').hidden = false;
+
+    // ---------- เรียกหลังบ้าน ----------
+    function call(fn) {
+      const args = Array.prototype.slice.call(arguments, 1);
+      return new Promise(resolve => {
+        google.script.run
+          .withSuccessHandler(res => resolve(res || { ok: false, message: 'ไม่ได้รับข้อมูลจากระบบ' }))
+          .withFailureHandler(err => resolve({ ok: false, message: 'เชื่อมต่อไม่สำเร็จ กรุณาลองใหม่อีกครั้ง (' + ((err && err.message) || err) + ')' }))[fn].apply(null, args);
+      });
+    }
+    async function act(fn, args, busyText) {
+      busy(busyText || 'กำลังบันทึก…');
+      const res = await call.apply(null, [fn].concat(args || []));
+      busy(false);
+      if (res.state) S.data = res.state;
+      if (res.message) toast(res.message, !res.ok);
+      return res;
+    }
+    async function refresh(showBusy) {
+      if (showBusy) busy('กำลังโหลดข้อมูล…');
+      const res = await call('getState');
+      if (showBusy) busy(false);
+      if (!res.ok) { if (showBusy || !S.data) toast(res.message, true); if (!S.data) renderError(res.message); return; }
+      const changed = JSON.stringify(res.state) !== JSON.stringify(S.data);
+      S.data = res.state;
+      const typing = document.activeElement && document.activeElement.matches('input');
+      if (changed && !typing) render();
+    }
+
+    // ---------- เครื่องมือ ----------
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+    function busy(text) { $('busy').hidden = !text; if (text) $('busy-text').textContent = text; }
+    let toastTimer;
+    function toast(text, isErr) {
+      const t = $('toast');
+      t.textContent = text;
+      t.className = 'toast show' + (isErr ? ' err' : '');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => { t.className = 'toast' + (isErr ? ' err' : ''); }, isErr ? 7000 : 3000);
+    }
+    $('toast').onclick = () => { $('toast').className = 'toast'; };
+    const club = id => S.data.clubs.find(c => c.id === id);
+    const clubColor = id => COLORS[(id - 1) % COLORS.length];
+    const memberAt = (room, no) => S.data.members.find(m => m.room === room && m.no === no);
+    const rosterOf = room => S.data.roster.filter(s => s.room === room);
+    const byRoomNo = (a, b) => a.room.localeCompare(b.room) || a.no - b.no;
+    const pct = c => Math.min(100, Math.round(c.count / c.capacity * 100));
+    function setMyClub(id) { myClub = id; try { localStorage.setItem('club-my', id); } catch (_) { /* ไม่จำก็ได้ */ } }
+    function roomRows(room) {
+      const byNo = {};
+      rosterOf(room).forEach(s => { byNo[s.no] = { no: s.no, name: s.name, clubId: null }; });
+      S.data.members.filter(m => m.room === room).forEach(m => { byNo[m.no] = { no: m.no, name: m.name, clubId: m.clubId }; });
+      return Object.keys(byNo).map(k => byNo[k]).sort((a, b) => a.no - b.no);
+    }
+    function capacityText() {
+      const caps = S.data.clubs.map(c => c.capacity);
+      return caps.every(x => x === caps[0]) ? caps[0] + ' คน' : 'ตามที่กำหนด';
+    }
+    function go(view) { S.view = view; window.scrollTo(0, 0); render(); }
+
+    // ---------- หน้าจอ ----------
+    function render() {
+      if (!S.data) return;
+      if (S.view === 'club' && !club(S.clubId)) S.view = 'home';
+      if (S.view === 'club' && !club(S.clubId).name) S.view = 'name';
+      ({ home: renderHome, name: renderName, club: renderClub, summary: renderSummary, admin: renderAdmin }[S.view] || renderHome)();
+      if (S.focus) { const el = document.querySelector(S.focus); S.focus = null; if (el) el.focus(); }
+    }
+
+    function renderError(msg) {
+      app.innerHTML = `<section class="card narrow"><h2>โหลดข้อมูลไม่สำเร็จ</h2><p class="muted" style="margin-top:8px">${esc(msg)}</p>
+        <button class="btn btn-primary btn-lg btn-block" style="margin-top:16px" data-reload>ลองใหม่</button></section>`;
+    }
+
+    function renderHome() {
+      const d = S.data;
+      const total = d.members.length;
+      const seats = d.clubs.reduce((s, c) => s + c.capacity, 0);
+      app.innerHTML = `
+        <section class="hero">
+          <h1>ระบบจัดชมรม ม.1</h1>
+          <p>นักเรียน ${esc(d.rooms[0])} – ${esc(d.rooms[d.rooms.length - 1])} · ${d.clubs.length} ชมรม · ชมรมละไม่เกิน ${capacityText()}</p>
+        </section>
+        <h2 class="section-title">ครูประจำชมรม: แตะที่ชมรมของคุณครู</h2>
+        <div class="club-grid">${d.clubs.map(clubCard).join('')}</div>
+        <section class="summary-cta">
+          <div><h2>ครูประจำชั้น</h2><p>ดูว่านักเรียนแต่ละห้องอยู่ชมรมไหน และสั่งพิมพ์ได้</p></div>
+          <button class="btn btn-primary btn-lg" data-go="summary">📋 ดูสรุปรายห้อง</button>
+        </section>
+        <p class="foot">กรอกแล้ว ${total} คน จากที่รับได้ทั้งหมด ${seats} ที่ · <button class="link" data-go="admin">ผู้ดูแลระบบ</button></p>`;
+    }
+
+    function clubCard(c) {
+      const full = c.count >= c.capacity;
+      const mine = myClub === c.id;
+      return `<button class="club-card${c.name ? '' : ' empty'}${mine ? ' mine' : ''}" data-club="${c.id}" style="--c:${clubColor(c.id)}">
+        <span class="club-no">ชมรมที่ ${c.id}</span>
+        ${mine ? '<span class="mine-tag">ชมรมของฉัน</span>' : ''}
+        <strong class="club-name">${c.name ? esc(c.name) : 'ยังไม่ตั้งชื่อ'}</strong>
+        <span class="club-teacher">${c.name ? esc(c.teacher) : 'แตะเพื่อตั้งชื่อชมรม'}</span>
+        <span class="meter"><span style="width:${pct(c)}%"></span></span>
+        <span class="club-count${full ? ' full' : ''}">${c.count} / ${c.capacity} คน${full ? ' · เต็มแล้ว' : ''}</span>
+      </button>`;
+    }
+
+    function renderName() {
+      const c = club(S.clubId);
+      app.innerHTML = `
+        <button class="back" data-go="${c.name ? 'club' : 'home'}">← ${c.name ? 'กลับไปหน้าชมรม' : 'กลับหน้าแรก'}</button>
+        <section class="card narrow" style="border-top:10px solid ${clubColor(c.id)}">
+          <p class="kicker">ชมรมที่ ${c.id}</p>
+          <h1>${c.name ? 'แก้ชื่อชมรม' : 'ตั้งชื่อชมรม'}</h1>
+          ${c.name ? '' : '<p class="muted" style="margin-top:6px">ทำครั้งเดียว แล้วเริ่มกรอกรายชื่อนักเรียนได้เลย</p>'}
+          <form id="name-form" autocomplete="off">
+            <label class="field">ชื่อชมรม
+              <input type="text" name="name" maxlength="60" required value="${esc(c.name)}" placeholder="เช่น ชมรมดนตรีไทย"></label>
+            <label class="field">ชื่อครูที่ปรึกษา <span class="opt">(ไม่ใส่ก็ได้)</span>
+              <input type="text" name="teacher" maxlength="60" value="${esc(c.teacher)}" placeholder="เช่น ครูสมศรี ใจดี"></label>
+            <button class="btn btn-primary btn-lg btn-block">${c.name ? 'บันทึก' : 'บันทึก แล้วเริ่มกรอกรายชื่อ →'}</button>
+          </form>
+        </section>`;
+      if (!c.name) S.focus = '#name-form input[name=name]';
+    }
+
+    function renderClub() {
+      const c = club(S.clubId);
+      const members = S.data.members.filter(m => m.clubId === c.id).sort(byRoomNo);
+      const full = c.count >= c.capacity;
+      app.innerHTML = `
+        <button class="back" data-go="home">← กลับหน้าแรก</button>
+        <section class="club-head" style="--c:${clubColor(c.id)}">
+          <div>
+            <p class="kicker">ชมรมที่ ${c.id}</p>
+            <h1>${esc(c.name)}</h1>
+            ${c.teacher ? `<p class="muted">ครูที่ปรึกษา: ${esc(c.teacher)}</p>` : ''}
+            <button class="link small" data-rename>✎ แก้ชื่อชมรม</button>
+          </div>
+          <div class="big-count"><strong>${c.count}</strong><span>/ ${c.capacity} คน</span></div>
+          <span class="meter lg"><span style="width:${pct(c)}%"></span></span>
+        </section>
+        ${full ? `<div class="notice">ชมรมเต็มแล้ว (${c.count}/${c.capacity} คน) ถ้าต้องการเพิ่มคนใหม่ ให้ลบชื่อออกก่อน หรือแจ้งผู้ดูแลระบบให้เพิ่มจำนวนที่รับ</div>` : addPanel(c)}
+        <section class="card">
+          <h2>รายชื่อสมาชิก (${members.length} คน)</h2>
+          ${members.length ? memberTable(members) : '<p class="empty-text">ยังไม่มีนักเรียน เริ่มเพิ่มได้จากกล่องด้านบน</p>'}
+        </section>`;
+      bindAddForm(c);
+    }
+
+    function addPanel(c) {
+      const rooms = S.data.rooms;
+      let step2 = '';
+      if (S.room) {
+        const roster = rosterOf(S.room);
+        if (roster.length) {
+          step2 = `
+            <p class="step"><span class="num">2</span> แตะชื่อนักเรียน ${esc(S.room)} ที่จะเข้าชมรมนี้</p>
+            <input type="search" id="filter" placeholder="🔍 ค้นหาเลขที่ หรือชื่อ" autocomplete="off">
+            <div class="pick-list" id="pick-list">${roster.map(s => pickButton(s, c)).join('')}</div>
+            <details class="manual"><summary>ไม่พบชื่อในรายการ? พิมพ์เอง</summary>${manualForm()}</details>`;
+        } else {
+          step2 = `<p class="step"><span class="num">2</span> พิมพ์เลขที่และชื่อนักเรียน ${esc(S.room)}</p>${manualForm()}`;
+        }
+      }
+      return `
+        <section class="card">
+          <h2>เพิ่มนักเรียนเข้าชมรม</h2>
+          <p class="step"><span class="num">1</span> เลือกห้อง</p>
+          <div class="room-row">${rooms.map(r => `<button class="room-btn${S.room === r ? ' on' : ''}" data-room="${esc(r)}">${esc(r)}</button>`).join('')}</div>
+          ${step2}
+        </section>`;
+    }
+
+    function pickButton(s, c) {
+      const m = memberAt(s.room, s.no);
+      const search = esc((s.no + ' ' + s.name).toLowerCase());
+      if (!m) return `<button class="pick" data-pick="${s.no}" data-search="${search}"><span class="pick-no">${s.no}</span><span class="pick-name">${esc(s.name)}</span><span class="pick-plus">＋ เพิ่ม</span></button>`;
+      const here = m.clubId === c.id;
+      const other = club(m.clubId);
+      return `<button class="pick${here ? ' here' : ''}" disabled data-search="${search}"><span class="pick-no">${s.no}</span><span class="pick-name">${esc(s.name)}</span>
+        <span class="pick-tag">${here ? '✓ อยู่ชมรมนี้แล้ว' : 'อยู่ชมรม<br>' + esc(other ? other.name : m.clubId)}</span></button>`;
+    }
+
+    function manualForm() {
+      return `<form id="add-form" class="add-form" autocomplete="off">
+        <label class="field">เลขที่<input class="in" type="text" name="no" inputmode="numeric" pattern="[0-9]*" maxlength="2" required></label>
+        <label class="field">ชื่อ-สกุล<input class="in" type="text" name="name" maxlength="80" required placeholder="เช่น ด.ช.สมชาย ใจดี"></label>
+        <p class="hint" id="no-hint"></p>
+        <button class="btn btn-primary btn-lg">＋ เพิ่มเข้าชมรม</button>
+      </form>`;
+    }
+
+    function bindAddForm(c) {
+      const filter = $('filter');
+      if (filter) filter.oninput = () => {
+        const q = filter.value.trim().toLowerCase();
+        document.querySelectorAll('#pick-list .pick').forEach(b => { b.hidden = q && b.dataset.search.indexOf(q) < 0; });
+      };
+      const form = $('add-form');
+      if (!form) return;
+      const noIn = form.elements.no;
+      const nameIn = form.elements.name;
+      noIn.oninput = () => {
+        noIn.value = noIn.value.replace(/\D/g, '');
+        const no = Number(noIn.value);
+        const hint = $('no-hint');
+        hint.className = 'hint';
+        hint.textContent = '';
+        nameIn.readOnly = false;
+        if (!no) return;
+        const m = memberAt(S.room, no);
+        const fromRoster = rosterOf(S.room).find(s => s.no === no);
+        if (m) {
+          const other = club(m.clubId);
+          hint.className = 'hint warn';
+          hint.textContent = m.clubId === c.id ? `เลขที่ ${no} (${m.name}) อยู่ในชมรมนี้แล้ว` : `เลขที่ ${no} (${m.name}) อยู่ชมรม "${other ? other.name : m.clubId}" แล้ว`;
+        } else if (fromRoster) {
+          nameIn.value = fromRoster.name;
+          nameIn.readOnly = true;
+          hint.className = 'hint ok';
+          hint.textContent = `พบชื่อในรายชื่อห้อง: ${fromRoster.name}`;
+        }
+      };
+      form.onsubmit = async e => {
+        e.preventDefault();
+        const res = await act('addMember', [c.id, S.room, noIn.value, nameIn.value]);
+        if (res.ok) S.focus = '#add-form input[name=no]';
+        render();
+        if (!res.ok) { const f = $('add-form'); if (f) { f.elements.no.value = noIn.value; f.elements.name.value = nameIn.value; f.elements.no.dispatchEvent(new Event('input')); } }
+      };
+    }
+
+    function memberTable(members) {
+      let html = '';
+      let room = null;
+      members.forEach(m => {
+        if (m.room !== room) {
+          if (room !== null) html += '</tbody></table>';
+          room = m.room;
+          const n = members.filter(x => x.room === room).length;
+          html += `<p class="room-group">${esc(room)} · ${n} คน</p><table class="list"><tbody>`;
+        }
+        html += `<tr><td class="n">${m.no}</td><td>${esc(m.name)}</td><td class="act"><button class="btn-del" data-del="${esc(m.room)}|${m.no}">ลบ</button></td></tr>`;
+      });
+      return html + '</tbody></table>';
+    }
+
+    function renderSummary() {
+      const d = S.data;
+      if (!S.sumTab) S.sumTab = d.rooms[0];
+      app.innerHTML = `
+        <button class="back" data-go="home">← กลับหน้าแรก</button>
+        <div class="page-head"><h1>สรุปรายห้อง</h1><p>สำหรับครูประจำชั้น: เลือกห้องเพื่อดูว่านักเรียนแต่ละคนอยู่ชมรมไหน</p></div>
+        <div class="tabs">
+          ${d.rooms.map(r => `<button class="tab${S.sumTab === r ? ' on' : ''}" data-tab="${esc(r)}">${esc(r)}</button>`).join('')}
+          <button class="tab${S.sumTab === 'clubs' ? ' on' : ''}" data-tab="clubs">ดูตามชมรม</button>
+        </div>
+        ${S.sumTab === 'clubs' ? clubsView() : roomView(S.sumTab)}`;
+    }
+
+    function roomView(room) {
+      const rows = roomRows(room);
+      const hasRoster = rosterOf(room).length > 0;
+      const inClub = rows.filter(r => r.clubId).length;
+      const counts = S.data.clubs.map(c => ({ c, n: rows.filter(r => r.clubId === c.id).length })).filter(x => x.n);
+      return `
+        <section class="card">
+          <div class="stats">
+            <div class="stat"><strong>${inClub}</strong>มีชมรมแล้ว</div>
+            ${hasRoster ? `<div class="stat warn"><strong>${rows.length - inClub}</strong>ยังไม่มีชมรม</div><div class="stat plain"><strong>${rows.length}</strong>นักเรียนทั้งห้อง</div>` : ''}
+          </div>
+          ${hasRoster ? '' : '<div class="notice info">ยังไม่มีรายชื่อนักเรียนทั้งห้องในระบบ จึงแสดงเฉพาะคนที่ครูชมรมกรอกแล้ว</div>'}
+          ${counts.length ? `<div class="chips">${counts.map(x => `<span class="chip">${esc(x.c.name)}<b>${x.n}</b></span>`).join('')}</div>` : ''}
+          <div class="row-actions">
+            <h2>${esc(room)}</h2>
+            <span><button class="btn" data-print="${esc(room)}">🖨 พิมพ์ห้องนี้</button> <button class="btn" data-print="rooms">🖨 พิมพ์ทุกห้อง</button></span>
+          </div>
+          ${rows.length ? `<table class="list"><thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>ชมรม</th></tr></thead><tbody>
+            ${rows.map(r => { const c = r.clubId && club(r.clubId); return `<tr class="${r.clubId ? '' : 'none'}"><td class="n">${r.no}</td><td>${esc(r.name)}</td>
+              <td class="club-cell">${c ? esc(c.name) + (c.teacher ? `<br><span class="muted small">${esc(c.teacher)}</span>` : '') : 'ยังไม่มีชมรม'}</td></tr>`; }).join('')}
+          </tbody></table>` : '<p class="empty-text">ยังไม่มีนักเรียนห้องนี้ในระบบ</p>'}
+        </section>`;
+    }
+
+    function clubsView() {
+      const d = S.data;
+      const total = d.members.length;
+      const named = d.clubs.filter(c => c.name);
+      return `
+        <section class="card">
+          <div class="stats">
+            <div class="stat plain"><strong>${total}</strong>นักเรียนที่มีชมรมแล้ว</div>
+            <div class="stat plain"><strong>${named.length ? (total / named.length).toFixed(1) : 0}</strong>เฉลี่ยต่อชมรม</div>
+          </div>
+          <div class="row-actions"><h2>ทุกชมรม</h2><button class="btn" data-print="clubs">🖨 พิมพ์รายชื่อทุกชมรม</button></div>
+        </section>
+        ${d.clubs.map(c => {
+          const ms = d.members.filter(m => m.clubId === c.id).sort(byRoomNo);
+          return `<section class="card club-block" style="--c:${clubColor(c.id)}">
+            <div class="row-actions" style="margin-top:0"><div><p class="kicker">ชมรมที่ ${c.id}</p><h3>${c.name ? esc(c.name) : '<span class="muted">ยังไม่ตั้งชื่อ</span>'}</h3>
+            ${c.teacher ? `<p class="muted small">${esc(c.teacher)}</p>` : ''}</div><strong>${c.count} / ${c.capacity} คน</strong></div>
+            ${ms.length ? `<table class="list"><thead><tr><th>ห้อง</th><th>เลขที่</th><th>ชื่อ-สกุล</th></tr></thead><tbody>
+              ${ms.map(m => `<tr><td>${esc(m.room)}</td><td class="n">${m.no}</td><td>${esc(m.name)}</td></tr>`).join('')}</tbody></table>` : ''}
+          </section>`;
+        }).join('')}`;
+    }
+
+    function renderAdmin() {
+      const d = S.data;
+      if (!S.pin) {
+        app.innerHTML = `
+          <button class="back" data-go="home">← กลับหน้าแรก</button>
+          <section class="card narrow"><h1>ผู้ดูแลระบบ</h1>
+            <form id="pin-form" autocomplete="off"><label class="field">รหัสผู้ดูแล<input type="password" name="pin" inputmode="numeric" required></label>
+            <button class="btn btn-primary btn-lg btn-block">เข้าสู่หน้าผู้ดูแล</button></form></section>`;
+        S.focus = '#pin-form input';
+        return;
+      }
+      const students = d.roster.length;
+      const fair = students ? Math.ceil(students / d.clubs.length) : 0;
+      const cap = d.clubs[0] ? d.clubs[0].capacity : 20;
+      app.innerHTML = `
+        <button class="back" data-go="home">← กลับหน้าแรก</button>
+        <div class="page-head"><h1>ผู้ดูแลระบบ</h1><p>ข้อมูลทั้งหมดอยู่ใน Google Sheet ด้วย จะเปิดแก้ในชีตโดยตรงก็ได้</p></div>
+        <section class="card">
+          <h2>จำนวนที่รับต่อชมรม</h2>
+          <p class="muted" style="margin-top:6px">ตอนนี้ ${capacityText()} · กรอกแล้ว ${d.members.length} คน${students ? ` · นักเรียนในรายชื่อ ${students} คน` : ''}</p>
+          ${students ? `<div class="notice info">นักเรียน ${students} คน ÷ ${d.clubs.length} ชมรม = ชมรมละ ${+(students / d.clubs.length).toFixed(1)} คน
+            → ตั้งเป็น <b>${fair} คน</b> ${students % d.clubs.length ? `ทุกคนจะมีที่ (บางชมรมได้ ${fair - 1}–${fair} คน)` : 'ได้ชมรมละเท่ากันพอดี'}
+            <div style="margin-top:10px"><button class="btn btn-primary" data-cap="${fair}">ใช้ ${fair} คนต่อชมรม</button></div></div>`
+            : '<div class="notice info">เมื่อใส่รายชื่อนักเรียนในแท็บ "รายชื่อนักเรียน" แล้ว ระบบจะคำนวณให้ว่าควรรับชมรมละกี่คนเพื่อให้แต่ละชมรมเท่ากัน</div>'}
+          <form id="cap-form" class="cap-row" style="margin-top:14px"><label class="field" style="margin:0">ตั้งเอง (คน)<input type="number" name="cap" min="1" max="200" value="${cap}" required></label>
+            <button class="btn btn-primary btn-lg">บันทึกจำนวน</button></form>
+        </section>
+        <section class="card">
+          <h2>ล้างชมรม</h2>
+          <p class="muted" style="margin-top:6px">ลบชื่อชมรมและรายชื่อสมาชิกทั้งหมดของชมรมนั้น ใช้เมื่อครูกรอกผิดชมรม</p>
+          <div class="admin-clubs">${d.clubs.map(c => `<div class="admin-club"><span><b>ชมรมที่ ${c.id}</b> ${c.name ? esc(c.name) : '<span class="muted">ยังไม่ตั้งชื่อ</span>'} · ${c.count} คน</span>
+            <button class="btn-del" data-reset="${c.id}" ${c.name || c.count ? '' : 'disabled'}>ล้าง</button></div>`).join('')}</div>
+        </section>`;
+    }
+
+    // ---------- พิมพ์ ----------
+    function printRooms(rooms) {
+      const today = new Date().toLocaleDateString('th-TH', { dateStyle: 'long' });
+      $('print-area').innerHTML = rooms.map(room => {
+        const rows = roomRows(room);
+        return `<section class="print-page"><h1>รายชื่อนักเรียน ${esc(room)} และชมรมที่เข้าร่วม</h1><p>ข้อมูล ณ วันที่ ${today} · มีชมรมแล้ว ${rows.filter(r => r.clubId).length} คน</p>
+          <table><thead><tr><th>เลขที่</th><th>ชื่อ-สกุล</th><th>ชมรม</th><th>ครูที่ปรึกษา</th></tr></thead><tbody>
+          ${rows.map(r => { const c = r.clubId && club(r.clubId); return `<tr><td>${r.no}</td><td>${esc(r.name)}</td><td class="${c ? '' : 'none'}">${c ? esc(c.name) : 'ยังไม่มีชมรม'}</td><td>${c ? esc(c.teacher) : ''}</td></tr>`; }).join('')}
+          </tbody></table></section>`;
+      }).join('');
+      window.print();
+    }
+    function printClubs() {
+      const today = new Date().toLocaleDateString('th-TH', { dateStyle: 'long' });
+      $('print-area').innerHTML = S.data.clubs.filter(c => c.name).map(c => {
+        const ms = S.data.members.filter(m => m.clubId === c.id).sort(byRoomNo);
+        return `<section class="print-page"><h1>ชมรม${esc(c.name.replace(/^ชมรม/, ''))}</h1><p>${c.teacher ? 'ครูที่ปรึกษา: ' + esc(c.teacher) + ' · ' : ''}สมาชิก ${ms.length} คน · ข้อมูล ณ วันที่ ${today}</p>
+          <table><thead><tr><th>ลำดับ</th><th>ห้อง</th><th>เลขที่</th><th>ชื่อ-สกุล</th></tr></thead><tbody>
+          ${ms.map((m, i) => `<tr><td>${i + 1}</td><td>${esc(m.room)}</td><td>${m.no}</td><td>${esc(m.name)}</td></tr>`).join('')}</tbody></table></section>`;
+      }).join('');
+      window.print();
+    }
+
+    // ---------- เหตุการณ์ ----------
+    document.addEventListener('click', async e => {
+      const t = e.target.closest('button');
+      if (!t || t.disabled || !S.data && !t.hasAttribute('data-reload')) return;
+      const ds = t.dataset;
+      if (t.hasAttribute('data-reload')) return refresh(true);
+      if (ds.go) { go(ds.go); if (ds.go === 'home' || ds.go === 'summary') refresh(false); return; }
+      if (ds.club) {
+        S.clubId = Number(ds.club);
+        S.room = null;
+        const c = club(S.clubId);
+        if (c.name) setMyClub(c.id);
+        go(c.name ? 'club' : 'name');
+        return refresh(false);
+      }
+      if (t.hasAttribute('data-rename')) return go('name');
+      if (ds.room) { S.room = ds.room; render(); const f = $('filter') || document.querySelector('#add-form input[name=no]'); if (f && !('ontouchstart' in window)) f.focus(); return; }
+      if (ds.pick) {
+        const no = Number(ds.pick);
+        const s = rosterOf(S.room).find(x => x.no === no);
+        const q = $('filter') ? $('filter').value : '';
+        await act('addMember', [S.clubId, S.room, no, s ? s.name : '']);
+        render();
+        if (q && $('filter')) { $('filter').value = q; $('filter').oninput(); }
+        return;
+      }
+      if (ds.del) {
+        const [room, no] = ds.del.split('|');
+        const m = memberAt(room, Number(no));
+        if (!m || !confirm(`ลบ ${m.name} (${room} เลขที่ ${no}) ออกจากชมรม?`)) return;
+        await act('removeMember', [S.clubId, room, Number(no)], 'กำลังลบ…');
+        return render();
+      }
+      if (ds.tab) { S.sumTab = ds.tab; return render(); }
+      if (ds.print) {
+        if (ds.print === 'clubs') return printClubs();
+        return printRooms(ds.print === 'rooms' ? S.data.rooms : [ds.print]);
+      }
+      if (ds.cap) { await act('adminSetCapacity', [S.pin, Number(ds.cap)]); return render(); }
+      if (ds.reset) {
+        const c = club(Number(ds.reset));
+        if (!confirm(`ล้างชมรมที่ ${c.id} ${c.name ? '"' + c.name + '"' : ''}?\nชื่อชมรมและรายชื่อสมาชิก ${c.count} คนจะถูกลบทั้งหมด`)) return;
+        await act('adminResetClub', [S.pin, c.id], 'กำลังล้าง…');
+        return render();
+      }
+    });
+
+    document.addEventListener('submit', async e => {
+      const f = e.target;
+      if (f.id === 'name-form') {
+        e.preventDefault();
+        const res = await act('saveClub', [S.clubId, f.elements.name.value, f.elements.teacher.value]);
+        if (res.ok) { setMyClub(S.clubId); go('club'); }
+      } else if (f.id === 'pin-form') {
+        e.preventDefault();
+        const pin = f.elements.pin.value;
+        const res = await act('adminCheck', [pin], 'กำลังตรวจรหัส…');
+        if (res.ok) { S.pin = pin; render(); }
+      } else if (f.id === 'cap-form') {
+        e.preventDefault();
+        await act('adminSetCapacity', [S.pin, Number(f.elements.cap.value)]);
+        render();
+      }
+    });
+
+    refresh(true);
+  })();
+  </script>
+</body>
+</html>
